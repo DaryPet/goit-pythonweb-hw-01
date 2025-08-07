@@ -1,11 +1,13 @@
 from abc import ABC, abstractmethod
 
+
 # 1. SRP: Клас Book відповідає лише за дані книги
 class Book:
     def __init__(self, title: str, author: str, year: int):
         self.title = title
         self.author = author
         self.year = year
+
 
 # 4. ISP: Інтерфейс для основних методів бібліотеки
 class LibraryInterface(ABC):
@@ -16,14 +18,15 @@ class LibraryInterface(ABC):
     @abstractmethod
     def remove_book(self, book_title: str):
         pass
-    
+
     @abstractmethod
     def get_all_books(self):
         pass
-    
+
     @abstractmethod
     def find_book(self, book_title: str):
         pass
+
 
 # 2. OCP, 3. LSP: Клас Library реалізує інтерфейс і може бути розширений
 class Library(LibraryInterface):
@@ -44,7 +47,8 @@ class Library(LibraryInterface):
 
     def get_all_books(self):
         return self._books
-        
+
+
 # 5. DIP: LibraryManager залежить від абстракції (LibraryInterface)
 class LibraryManager:
     def __init__(self, library: LibraryInterface):
@@ -76,6 +80,7 @@ class LibraryManager:
             for book in books:
                 print(f"- '{book.title}' by {book.author} ({book.year})")
 
+
 def main():
     library = Library()
     manager = LibraryManager(library)
@@ -98,6 +103,7 @@ def main():
                 break
             case _:
                 print("Invalid command. Please try again.")
+
 
 if __name__ == "__main__":
     main()
