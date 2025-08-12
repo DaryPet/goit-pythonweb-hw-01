@@ -1,88 +1,95 @@
+import logging
 from abc import ABC, abstractmethod
+from typing import List, Optional
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 # 1. SRP: Клас Book відповідає лише за дані книги
 class Book:
-    def __init__(self, title: str, author: str, year: int):
-        self.title = title
-        self.author = author
-        self.year = year
+    def __init__(self, title: str, author: str, year: int) -> None:
+        self.title: str = title
+        self.author: str = author
+        self.year: int = year
 
 
-# 4. ISP: Інтерфейс для основних методів бібліотеки
+# 2. ISP: Інтерфейс для основних методів бібліотеки
 class LibraryInterface(ABC):
     @abstractmethod
-    def add_book(self, book: Book):
+    def add_book(self, book: Book) -> None:
         pass
 
     @abstractmethod
-    def remove_book(self, book_title: str):
+    def remove_book(self, book_title: str) -> bool:
         pass
 
     @abstractmethod
-    def get_all_books(self):
+    def get_all_books(self) -> List[Book]:
         pass
 
     @abstractmethod
-    def find_book(self, book_title: str):
+    def find_book(self, book_title: str) -> Optional[Book]:
         pass
 
 
-# 2. OCP, 3. LSP: Клас Library реалізує інтерфейс і може бути розширений
+# 3. OCP, 3. LSP: Клас Library реалізує інтерфейс і може бути розширений
 class Library(LibraryInterface):
-    def __init__(self):
-        self._books = []
+    def __init__(self) -> None:
+        self._books: List[Book] = []
 
-    def add_book(self, book: Book):
+    def add_book(self, book: Book) -> None:
         self._books.append(book)
 
-    def remove_book(self, book_title: str):
-        self._books = [book for book in self._books if book.title != book_title]
+    def remove_book(self, book_title: str) -> bool:
+        for i, b in enumerate(self._books):
+            if b.title == book_title:
+                del self._books[i]
+                return True
+        return False
 
-    def find_book(self, book_title: str):
+    def find_book(self, book_title: str) -> Optional[Book]:
         for book in self._books:
             if book.title == book_title:
                 return book
         return None
 
-    def get_all_books(self):
-        return self._books
+    def get_all_books(self) -> List[Book]:
+        return list(self._books)
 
 
 # 5. DIP: LibraryManager залежить від абстракції (LibraryInterface)
 class LibraryManager:
-    def __init__(self, library: LibraryInterface):
-        self.library = library
+    def __init__(self, library: LibraryInterface) -> None:
+        self.library: LibraryInterface = library
 
-    def add_book(self, title: str, author: str, year: str):
+    def add_book(self, title: str, author: str, year: str) -> None:
         try:
-            year_int = int(year)
-            book = Book(title, author, year_int)
-            self.library.add_book(book)
-            print(f"Book '{title}' added.")
+            year_int: int = int(year)
         except ValueError:
-            print("Invalid year. Please enter a number.")
+            logger.info("Invalid year. Please enter a number.")
+            return
+        self.library.add_book(Book(title, author, year_int))
+        logger.info(f"Book '{title}' added.")
 
-    def remove_book(self, title: str):
-        book_to_remove = self.library.find_book(title)
-        if book_to_remove:
-            self.library.remove_book(title)
-            print(f"Book '{title}' removed.")
+    def remove_book(self, title: str) -> None:
+        if self.library.remove_book(title):
+            logger.info(f"Book '{title}' removed.")
         else:
-            print(f"Book '{title}' not found.")
+            logger.info(f"Book '{title}' not found.")
 
-    def show_books(self):
-        books = self.library.get_all_books()
+    def show_books(self) -> None:
+        books: List[Book] = self.library.get_all_books()
         if not books:
-            print("The library is empty.")
-        else:
-            print("Current books in the library:")
-            for book in books:
-                print(f"- '{book.title}' by {book.author} ({book.year})")
+            logger.info("The library is empty.")
+            return
+        logger.info("Current books in the library:")
+        for book in books:
+            logger.info(f"- '{book.title}' by {book.author} ({book.year})")
 
 
-def main():
-    library = Library()
+def main() -> None:
+    library: LibraryInterface = Library()
     manager = LibraryManager(library)
 
     while True:
@@ -90,19 +97,19 @@ def main():
 
         match command:
             case "add":
-                title = input("Enter book title: ").strip()
-                author = input("Enter book author: ").strip()
-                year = input("Enter book year: ").strip()
+                title: str = input("Enter book title: ").strip()
+                author: str = input("Enter book author: ").strip()
+                year: str = input("Enter book year: ").strip()
                 manager.add_book(title, author, year)
             case "remove":
-                title = input("Enter book title to remove: ").strip()
+                title: str = input("Enter book title to remove: ").strip()
                 manager.remove_book(title)
             case "show":
                 manager.show_books()
             case "exit":
                 break
             case _:
-                print("Invalid command. Please try again.")
+                logger.info("Invalid command. Please try again.")
 
 
 if __name__ == "__main__":

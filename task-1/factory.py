@@ -7,8 +7,8 @@ logger = logging.getLogger(__name__)
 
 class Vehicle(ABC):
     def __init__(self, make: str, model: str) -> None:
-        self.make = make
-        self.model = model
+        self.make: str = make
+        self.model: str = model
 
     @abstractmethod
     def start_engine(self) -> None:
@@ -16,16 +16,11 @@ class Vehicle(ABC):
 
 
 class Car(Vehicle):
-    def __init__(self, make: str, model: str) -> None:
-        super().__init__(make, model)
-
     def start_engine(self) -> None:
         logger.info(f"{self.make} {self.model}: Двигун запущено")
 
 
 class Motorcycle(Vehicle):
-    def __init__(self, make: str, model: str) -> None:
-        super().__init__(make, model)
 
     def start_engine(self) -> None:
         logger.info(f"{self.make} {self.model}: Мотор заведено")
@@ -33,36 +28,40 @@ class Motorcycle(Vehicle):
 
 class VehicleFactory(ABC):
     @abstractmethod
-    def create_car(self, make: str, model: str) -> Vehicle:
+    def create_car(self, make: str, model: str) -> Car:
         pass
 
     @abstractmethod
-    def create_motorcycle(self, make: str, model: str) -> Vehicle:
+    def create_motorcycle(self, make: str, model: str) -> Motorcycle:
         pass
 
 
 class USVehicleFactory(VehicleFactory):
-    def create_car(self, make: str, model: str) -> Vehicle:
-        return Car(make, f"{model} (US Spec)")
+    SPEC: str = "US Spec"
 
-    def create_motorcycle(self, make: str, model: str) -> Vehicle:
-        return Motorcycle(make, f"{model} (US Spec)")
+    def create_car(self, make: str, model: str) -> Car:
+        return Car(make, f"{model} ({self.SPEC}")
+
+    def create_motorcycle(self, make: str, model: str) -> Motorcycle:
+        return Motorcycle(make, f"{model} ({self.SPEC})")
 
 
 class EUVehicleFactory(VehicleFactory):
-    def create_car(self, make: str, model: str) -> Vehicle:
-        return Car(make, f"{model} (EU Spec)")
+    SPEC: str = "EU Spec"
 
-    def create_motorcycle(self, make: str, model: str) -> Vehicle:
-        return Motorcycle(make, f"{model} (EU Spec)")
+    def create_car(self, make: str, model: str) -> Car:
+        return Car(make, f"{model} ({self.SPEC})")
+
+    def create_motorcycle(self, make: str, model: str) -> Motorcycle:
+        return Motorcycle(make, f"{model} ({self.SPEC})")
 
 
 if __name__ == "__main__":
-    us_factory = USVehicleFactory()
-    eu_factory = EUVehicleFactory()
+    us_factory: VehicleFactory = USVehicleFactory()
+    eu_factory: VehicleFactory = EUVehicleFactory()
 
-    vehicle1 = us_factory.create_car("Ford", "Mustang")
-    vehicle2 = eu_factory.create_motorcycle("BMW", "R1250")
+    vehicle1: Vehicle = us_factory.create_car("Ford", "Mustang")
+    vehicle2: Vehicle = eu_factory.create_motorcycle("BMW", "R1250")
 
     vehicle1.start_engine()
     vehicle2.start_engine()
