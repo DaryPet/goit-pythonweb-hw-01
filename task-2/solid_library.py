@@ -1,9 +1,8 @@
-import logging
 from abc import ABC, abstractmethod
 from typing import List, Optional
+from logger import get_logger
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 # 1. SRP: Клас Book відповідає лише за дані книги

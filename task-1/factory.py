@@ -1,8 +1,7 @@
-import logging
 from abc import ABC, abstractmethod
+from logger import get_logger
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class Vehicle(ABC):
@@ -40,7 +39,7 @@ class USVehicleFactory(VehicleFactory):
     SPEC: str = "US Spec"
 
     def create_car(self, make: str, model: str) -> Car:
-        return Car(make, f"{model} ({self.SPEC}")
+        return Car(make, f"{model} ({self.SPEC})")
 
     def create_motorcycle(self, make: str, model: str) -> Motorcycle:
         return Motorcycle(make, f"{model} ({self.SPEC})")
